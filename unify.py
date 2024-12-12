@@ -91,6 +91,12 @@ def main():
     new_hdrs = []
     for hdr in hdrs.values():
       for inc in hdr.includes:
+        # Passing e.g. <stdbool.h> to Path.exists on win32 results in:
+        #   OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect.
+        # Assume that any <>-style includes are system-includes that we don't
+        # want to unify anyway.
+        if '<' in inc: continue
+
         include_path = Path(inc.strip('"'))
         open_path = include_dir / include_path
 
